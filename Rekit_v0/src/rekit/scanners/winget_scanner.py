@@ -42,25 +42,23 @@ class WinGetScanner:
                     shell=False,
                 )
 
+                command_error = None
                 if result.returncode != 0:
-                    detail = (result.stderr or "").strip()[:500]
-                    message = "WinGet export command failed."
+                    detail = (result.stderr or result.stdout or "").strip()[:500]
+                    command_error = "WinGet export command failed."
                     if detail:
-                        message = f"{message} {detail}"
-                    return ScanResult(source=self.source, errors=[message])
+                        command_error = f"{command_error} {detail}"
 
                 try:
                     export_data = json.loads(output_path.read_text(encoding="utf-8"))
                 except FileNotFoundError:
-                    return ScanResult(
-                        source=self.source,
-                        errors=["WinGet did not create an export file."],
-                    )
+                    message = command_error or "WinGet did not create an export file."
+                    return ScanResult(source=self.source, errors=[message])
                 except (OSError, json.JSONDecodeError) as exc:
-                    return ScanResult(
-                        source=self.source,
-                        errors=[f"WinGet export file could not be read: {exc}"],
-                    )
+                    errors = [f"WinGet export file could not be read: {exc}"]
+                    if command_error:
+                        errors.insert(0, command_error)
+                    return ScanResult(source=self.source, errors=errors)
 
         except FileNotFoundError:
             return ScanResult(
@@ -78,7 +76,14 @@ class WinGetScanner:
                 errors=[f"WinGet could not be executed: {exc}"],
             )
 
-        return self._parse_export(export_data)
+        scan_result = self._parse_export(export_data)
+        if command_error:
+            return ScanResult(
+                source=self.source,
+                applications=scan_result.applications,
+                errors=[command_error, *scan_result.errors],
+            )
+        return scan_result
 
     @classmethod
     def _parse_export(cls, export_data: Any) -> ScanResult:
