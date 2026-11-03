@@ -5,12 +5,15 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "rekit"
 version = "0.1.0"
-description = "A local application discovery and inventory tool for Windows."
+description = "A cross-platform local application inventory tool."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "pydantic>=2.7,<3",
 ]
+
+[project.scripts]
+rekit = "rekit.main:main"
 
 [project.optional-dependencies]
 dev = [

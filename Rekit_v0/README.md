@@ -1,18 +1,21 @@
 # Rekit v0
 
-Rekit is a Windows-first application inventory tool. The initial release focuses on discovering installed applications and maintaining a local catalog. It does not install, remove, or modify applications.
+Rekit is a Python 3.12+ application inventory tool. Its core is designed to be cross-platform, while operating-system-specific discovery features are isolated in scanner adapters.
+
+The initial release maintains a local catalog of application metadata. It does not install, remove, update, or modify applications.
 
 ## Requirements
 
-- Windows 10 or later
 - Python 3.12 or later
 - Git
 
-The Registry scanner is Windows-specific. Other modules should remain importable and testable on non-Windows systems.
+Windows-specific discovery adapters will require Windows. The core catalog, JSON storage, and CLI are platform-independent.
 
 ## Development setup
 
-Run these commands from the `Rekit_v0` directory in PowerShell:
+Run these commands from the `Rekit_v0` directory.
+
+### Windows PowerShell
 
 ```powershell
 py -3.12 -m venv .venv
@@ -21,9 +24,27 @@ python -m pip install --upgrade pip
 python -m pip install -e ".[dev]"
 ```
 
+### Linux or macOS
+
+```bash
+python3.12 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -e ".[dev]"
+```
+
+## Usage
+
+```bash
+rekit add "Example App" --version 1.0 --publisher Example
+rekit list
+```
+
+The catalog is stored at `~/.rekit/applications.json`.
+
 ## Validation
 
-```powershell
+```bash
 python -m pytest
 python -m ruff check .
 python -m mypy src
@@ -31,12 +52,11 @@ python -m mypy src
 
 ## Current scope
 
-- Read-only discovery of installed application metadata
-- Registry and WinGet discovery adapters
-- Normalized application records
-- Duplicate detection with conservative matching
-- Local JSON catalog
+- Cross-platform application data model
 - Manual application registration
+- Local JSON catalog with atomic replacement
+- CLI for adding and listing catalog entries
+- Windows Registry and WinGet discovery adapters are planned
 
 Application installation, cloud synchronization, account management, and GUI workflows are out of scope for this version.
 
