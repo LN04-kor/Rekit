@@ -141,6 +141,23 @@ def test_keeps_records_with_different_install_locations_separate() -> None:
     assert len(result) == 2
 
 
+def test_keeps_records_with_different_package_ids_separate() -> None:
+    first = make_application(
+        name="Example App",
+        source=ApplicationSource.WINGET,
+        package_id="Publisher.One",
+    )
+    second = make_application(
+        name="Example App",
+        source=ApplicationSource.WINGET,
+        package_id="Publisher.Two",
+    )
+
+    result = ApplicationMatcher().merge([first, second])
+
+    assert len(result) == 2
+
+
 def test_does_not_automatically_merge_manual_entries() -> None:
     manual = make_application(
         name="Example App",
