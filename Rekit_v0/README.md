@@ -41,7 +41,7 @@ rekit list
 rekit add "Example App" --version 1.0 --publisher Example
 ```
 
-Run `rekit scan` on Windows to discover applications through the Windows Registry and WinGet. The command replaces previously discovered entries with the latest scan results while preserving manually registered applications. Partial results are saved and scanner warnings are displayed.
+Run `rekit scan` on Windows to discover applications through the Windows Registry and WinGet. The command refreshes discovered entries while preserving manually registered applications. If a scanner reports errors, its previous entries are retained so an incomplete scan cannot erase catalog data. Partial results and warnings are still reported.
 
 The catalog is stored at `~/.rekit/applications.json`.
 
