@@ -43,7 +43,7 @@ class WinGetScanner:
                 )
 
                 if result.returncode != 0:
-                    detail = result.stderr.strip()[:500]
+                    detail = (result.stderr or "").strip()[:500]
                     message = "WinGet export command failed."
                     if detail:
                         message = f"{message} {detail}"
