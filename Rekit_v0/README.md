@@ -53,6 +53,7 @@ python -m mypy src
 ## Current scope
 
 - Cross-platform application data model
+- Shared scanner protocol and scan result model
 - Manual application registration
 - Local JSON catalog with atomic replacement
 - CLI for adding and listing catalog entries
