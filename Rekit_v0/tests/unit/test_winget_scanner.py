@@ -57,6 +57,25 @@ def test_winget_scanner_reads_package_metadata() -> None:
     assert result.errors == []
 
 
+def test_winget_scanner_reads_current_package_identifier_field() -> None:
+    export_data = {
+        "Sources": [
+            {
+                "Packages": [
+                    {"PackageIdentifier": "Example.Current", "Version": "3.2.1"}
+                ]
+            }
+        ]
+    }
+
+    result = WinGetScanner(runner=make_runner(export_data)).scan()
+
+    assert len(result.applications) == 1
+    assert result.applications[0].package_id == "Example.Current"
+    assert result.applications[0].version == "3.2.1"
+    assert result.errors == []
+
+
 def test_winget_scanner_uses_safe_noninteractive_command() -> None:
     export_data = {"Sources": []}
     captured: dict[str, Any] = {}
