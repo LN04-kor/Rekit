@@ -46,7 +46,11 @@ def run_command(
             [RegistryScanner(), WinGetScanner()]
         )
         result = service.discover()
-        catalog.sync_discovered_applications(result.applications)
+        failed_sources = {scan.source for scan in result.scans if scan.errors}
+        catalog.sync_discovered_applications(
+            result.applications,
+            preserve_sources=failed_sources,
+        )
 
         print(f"Discovered {len(result.applications)} applications.")
         for application in result.applications:
