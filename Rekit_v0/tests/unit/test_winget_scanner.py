@@ -1,4 +1,5 @@
 import json
+from collections.abc import Callable
 from pathlib import Path
 from subprocess import CompletedProcess, TimeoutExpired
 from typing import Any
@@ -11,7 +12,7 @@ def make_runner(
     export_data: Any,
     returncode: int = 0,
     stderr: str = "",
-) -> Any:
+) -> Callable[..., CompletedProcess[str]]:
     def runner(command: list[str], **kwargs: Any) -> CompletedProcess[str]:
         output_path = Path(command[command.index("--output") + 1])
         output_path.write_text(json.dumps(export_data), encoding="utf-8")
