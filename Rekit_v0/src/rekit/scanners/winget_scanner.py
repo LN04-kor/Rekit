@@ -113,7 +113,8 @@ class WinGetScanner:
             for package_index, package_data in enumerate(packages):
                 if not isinstance(package_data, dict):
                     errors.append(
-                        f"WinGet package entry {source_index}:{package_index} is invalid."
+                        f"WinGet package entry {source_index}:{package_index} "
+                        "is invalid."
                     )
                     continue
 
