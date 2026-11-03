@@ -57,6 +57,7 @@ python -m mypy src
 - Read-only Windows Registry application discovery
 - Read-only WinGet package discovery through JSON export
 - Conservative application matching and metadata merging across discovery sources
+- Scanner orchestration with isolated failures and combined discovery results
 - Manual application registration
 - Local JSON catalog with atomic replacement
 - CLI for adding and listing catalog entries
