@@ -59,7 +59,7 @@ Registry and WinGet are independent sources. A Registry display name must not be
 
 The Registry scanner reads uninstall metadata from the machine-wide and current-user hives, including both 32-bit and 64-bit registry views. Duplicate discoveries are retained at the scanner boundary and are handled by the catalog matching stage.
 
-The WinGet scanner runs `winget export --include-versions` with a fixed argument list and writes the export to a temporary directory. It reads package identifiers and optional versions from the documented `Sources[].Packages[]` structure. Since the export schema does not include a display name, the package identifier is used as the provisional application name. Packages that cannot be matched to a configured source may be omitted by WinGet and remain discoverable through the Registry scanner.
+The WinGet scanner runs `winget export --include-versions` with a fixed argument list and writes the export to a temporary directory. It reads package identifiers and optional versions from the documented `Sources[].Packages[]` structure, supporting both the `PackageIdentifier` field and the legacy `Id` field. Since the export schema does not include a display name, the package identifier is used as the provisional application name. Packages that cannot be matched to a configured source may be omitted by WinGet and remain discoverable through the Registry scanner.
 
 The scanner does not accept source agreements automatically, does not invoke installation commands, and applies a process timeout. Its subprocess runner is injectable so unit tests do not require Windows or an installed WinGet executable.
 
