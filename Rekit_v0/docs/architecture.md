@@ -10,24 +10,16 @@ Installing, updating, or removing software is outside this version.
 
 ```text
 CLI
- |
- v
-Catalog services
- |
- v
-Storage interface
- |
- v
-JSON storage adapter
-
-Discovery services
- |
- v
-Scanner interface
- |
- |----------------------|
- v                      v
-Windows adapters     Future platform adapters
+ |------------------|
+ v                  v
+Catalog services  Discovery services
+ |                  |
+ v                  v
+JSON storage      Scanner interface
+                    |
+             |--------------|
+             v              v
+        Windows adapters  Future adapters
 ```
 
 Domain models are shared by services, scanners, catalog, and storage. Low-level adapters must not depend on the CLI.
@@ -44,42 +36,37 @@ Domain models are shared by services, scanners, catalog, and storage. Low-level 
 
 ## Portability boundary
 
-The domain model, catalog, JSON storage, and CLI use the Python standard library and platform-neutral dependencies. Platform-specific APIs must only be imported inside their corresponding adapter modules. A platform adapter must report unavailability without preventing the shared core from loading.
+The domain model, catalog, JSON storage, and CLI use platform-neutral dependencies. Platform-specific APIs must only be imported inside their corresponding adapter modules. A platform adapter must report unavailability without preventing the shared core from loading.
 
 ## Discovery flow
 
-1. DiscoveryService invokes each configured scanner independently.
-2. A scanner returns normalized records and structured scan diagnostics.
-3. A scanner failure is recorded without discarding successful results from other sources.
-4. Results are checked against the scanner's declared source before aggregation.
-5. The catalog matcher compares all collected records using conservative rules.
-6. DiscoveryResult returns the merged applications together with each scanner's original result and diagnostics.
-7. Persistence is handled separately by catalog services after validation succeeds.
+1. The CLI invokes DiscoveryService with the Registry and WinGet scanners.
+2. DiscoveryService invokes each configured scanner independently.
+3. A scanner returns normalized records and structured scan diagnostics.
+4. A scanner failure is recorded without discarding successful results from other sources.
+5. Results are checked against the scanner's declared source before aggregation.
+6. The catalog matcher compares all collected records using conservative rules.
+7. DiscoveryResult returns merged applications together with each scanner's diagnostics.
+8. The CLI replaces records from successful scanner sources, preserves previous records from sources that reported errors, and always preserves manually registered records.
 
-Registry and WinGet are independent sources. A Registry display name must not be treated as proof of a WinGet package identifier.
+The Registry scanner reads uninstall metadata from the machine-wide and current-user hives, including both 32-bit and 64-bit registry views. Duplicate discoveries are handled by the catalog matching stage.
 
-The Registry scanner reads uninstall metadata from the machine-wide and current-user hives, including both 32-bit and 64-bit registry views. Duplicate discoveries are retained at the scanner boundary and are handled by the catalog matching stage.
+The WinGet scanner runs `winget export --include-versions` with a fixed argument list and writes the export to a temporary directory. It reads package identifiers and optional versions from the `Sources[].Packages[]` structure, supporting both the `PackageIdentifier` field and the legacy `Id` field. Since the export schema does not include a display name, the package identifier is used as the provisional application name. Packages that cannot be matched to a configured source may be omitted by WinGet and remain discoverable through the Registry scanner.
 
-The WinGet scanner runs `winget export --include-versions` with a fixed argument list and writes the export to a temporary directory. It reads package identifiers and optional versions from the documented `Sources[].Packages[]` structure, supporting both the `PackageIdentifier` field and the legacy `Id` field. Since the export schema does not include a display name, the package identifier is used as the provisional application name. Packages that cannot be matched to a configured source may be omitted by WinGet and remain discoverable through the Registry scanner.
-
-The application matcher normalizes names for case- and punctuation-insensitive comparison. It also supports a conservative package-identifier comparison when the identifier's publisher prefix agrees with the Registry publisher. Conflicting versions, publishers, install locations, or package identifiers prevent automatic merging. Manual entries are never automatically merged. Groups use complete-link matching so a record must be compatible with every member of a group. When records are merged, Registry metadata is preferred and a WinGet package identifier is retained.
+The application matcher normalizes names for case- and punctuation-insensitive comparison. Conflicting metadata prevents automatic merging, and manual entries are never automatically merged.
 
 The scanner does not accept source agreements automatically, does not invoke installation commands, and applies a process timeout. Its subprocess runner is injectable so unit tests do not require Windows or an installed WinGet executable.
 
-## Data model principles
+## Catalog synchronization
 
-- Rekit record IDs are distinct from external package identifiers.
-- Source information is retained for traceability.
-- Optional metadata remains optional; unknown values are not fabricated.
-- Matching confidence and match rationale should be explicit.
-- Installed state and saved catalog membership are separate concepts.
+A scan is treated as a snapshot for each successful source. Records from successful sources are refreshed, records from sources that reported errors are retained to avoid destructive loss, and manual records remain untouched. Partial discovery results are persisted alongside diagnostics printed by the CLI. A non-zero CLI exit code indicates that one or more scanners reported errors; it does not mean that successful results were discarded.
 
 ## Security boundaries
 
 - Discovery is read-only and limited to application metadata.
 - No administrator elevation is requested for ordinary discovery.
 - External process execution uses fixed executables and argument arrays, never shell command strings.
-- External process execution must use timeouts, bounded output handling, and explicit exit-code checks.
+- External process execution must use timeouts and explicit exit-code checks.
 - Package identifiers and paths are treated as untrusted data and validated before use.
 - JSON writes use a temporary file in the destination directory followed by atomic replacement where supported.
 - Invalid or corrupted catalog data must not be silently overwritten.

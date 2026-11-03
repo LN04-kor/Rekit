@@ -1,7 +1,6 @@
 from collections.abc import Sequence
 
 from rekit.catalog.matcher import ApplicationMatcher
-from rekit.models.application import Application
 from rekit.models.discovery_result import DiscoveryResult
 from rekit.models.scan_result import ScanResult
 from rekit.scanners.base import ApplicationScanner
