@@ -53,10 +53,12 @@ python -m mypy src
 ## Current scope
 
 - Cross-platform application data model
+- Shared scanner protocol and scan result model
+- Read-only Windows Registry application discovery
 - Manual application registration
 - Local JSON catalog with atomic replacement
 - CLI for adding and listing catalog entries
-- Windows Registry and WinGet discovery adapters are planned
+- WinGet discovery adapter is planned
 
 Application installation, cloud synchronization, account management, and GUI workflows are out of scope for this version.
 
