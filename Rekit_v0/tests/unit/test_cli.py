@@ -14,7 +14,11 @@ class FakeScanner:
         applications: list[Application],
         errors: list[str] | None = None,
     ) -> None:
-        self.source = ApplicationSource.REGISTRY
+        self.source = (
+            applications[0].source
+            if applications
+            else ApplicationSource.REGISTRY
+        )
         self._applications = applications
         self._errors = errors or []
 
@@ -107,3 +111,22 @@ def test_existing_cli_commands_remain_available(tmp_path: Path, capsys) -> None:
 
     assert "Registered: Manual App" in output
     assert "Manual App (2.0) [manual]" in output
+
+ 
+def test_scan_command_preserves_previous_records_for_failed_scanner(
+    tmp_path: Path,
+) -> None:
+    catalog = make_catalog(tmp_path)
+    previous_application = Application(
+        name="Previously Discovered App",
+        source=ApplicationSource.REGISTRY,
+    )
+    catalog.add_application(previous_application)
+    service = DiscoveryService(
+        [FakeScanner([], ["Registry access was incomplete."])]
+    )
+
+    exit_code = run_command(catalog, ["scan"], service)
+
+    assert exit_code == 1
+    assert catalog.list_applications() == [previous_application]
