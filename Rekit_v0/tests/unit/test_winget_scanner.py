@@ -128,6 +128,32 @@ def test_winget_scanner_reports_command_failure() -> None:
     ]
 
 
+def test_winget_scanner_preserves_partial_results_on_command_failure() -> None:
+    export_data = {
+        "Sources": [
+            {
+                "Packages": [
+                    {"PackageIdentifier": "Example.Available", "Version": "1.2.3"}
+                ]
+            }
+        ]
+    }
+    runner = make_runner(
+        export_data,
+        returncode=1,
+        stderr="Some installed packages could not be matched.",
+    )
+
+    result = WinGetScanner(runner=runner).scan()
+
+    assert len(result.applications) == 1
+    assert result.applications[0].package_id == "Example.Available"
+    assert result.applications[0].version == "1.2.3"
+    assert result.errors == [
+        "WinGet export command failed. Some installed packages could not be matched."
+    ]
+
+
 def test_winget_scanner_reports_invalid_json() -> None:
     def runner(command: list[str], **kwargs: Any) -> CompletedProcess[str]:
         output_path = Path(command[command.index("--output") + 1])
