@@ -69,6 +69,10 @@ class ApplicationMatcher:
             ):
                 return True
 
+        if first.package_id and second.package_id:
+            if cls._normalize(first.package_id) != cls._normalize(second.package_id):
+                return True
+
         return False
 
     @classmethod
@@ -86,7 +90,9 @@ class ApplicationMatcher:
 
         publisher_prefix = cls._normalize(package_parts[0])
         publisher_name = cls._normalize(named_application.publisher)
-        if not publisher_name.startswith(publisher_prefix):
+        if len(publisher_prefix) < 4 or not publisher_name.startswith(
+            publisher_prefix
+        ):
             return False
 
         package_name = cls._normalize("".join(package_parts[1:]))
