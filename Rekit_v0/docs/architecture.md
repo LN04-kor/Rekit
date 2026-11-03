@@ -47,7 +47,7 @@ The domain model, catalog, JSON storage, and CLI use platform-neutral dependenci
 5. Results are checked against the scanner's declared source before aggregation.
 6. The catalog matcher compares all collected records using conservative rules.
 7. DiscoveryResult returns merged applications together with each scanner's diagnostics.
-8. The CLI replaces previous discovered records with the latest scan results and preserves manually registered records.
+8. The CLI replaces records from successful scanner sources, preserves previous records from sources that reported errors, and always preserves manually registered records.
 
 The Registry scanner reads uninstall metadata from the machine-wide and current-user hives, including both 32-bit and 64-bit registry views. Duplicate discoveries are handled by the catalog matching stage.
 
@@ -59,7 +59,7 @@ The scanner does not accept source agreements automatically, does not invoke ins
 
 ## Catalog synchronization
 
-A scan is treated as a snapshot of discovered applications. Each scan replaces the previous Registry and WinGet records, while manual records remain untouched. Partial discovery results are persisted alongside diagnostics printed by the CLI. A non-zero CLI exit code indicates that one or more scanners reported errors; it does not mean that successful results were discarded.
+A scan is treated as a snapshot for each successful source. Records from successful sources are refreshed, records from sources that reported errors are retained to avoid destructive loss, and manual records remain untouched. Partial discovery results are persisted alongside diagnostics printed by the CLI. A non-zero CLI exit code indicates that one or more scanners reported errors; it does not mean that successful results were discarded.
 
 ## Security boundaries
 
