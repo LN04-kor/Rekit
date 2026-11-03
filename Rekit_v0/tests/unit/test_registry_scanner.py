@@ -9,7 +9,7 @@ class FakeKey:
         self.name = name
         self.values = values
 
-    def __enter__(self) -> FakeKey:
+    def __enter__(self) -> "FakeKey":
         return self
 
     def __exit__(
