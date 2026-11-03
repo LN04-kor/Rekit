@@ -24,10 +24,26 @@ class RegistryScanner:
         errors: list[str] = []
 
         targets = [
-            ("HKEY_LOCAL_MACHINE", registry.HKEY_LOCAL_MACHINE, registry.KEY_WOW64_64KEY),
-            ("HKEY_LOCAL_MACHINE", registry.HKEY_LOCAL_MACHINE, registry.KEY_WOW64_32KEY),
-            ("HKEY_CURRENT_USER", registry.HKEY_CURRENT_USER, registry.KEY_WOW64_64KEY),
-            ("HKEY_CURRENT_USER", registry.HKEY_CURRENT_USER, registry.KEY_WOW64_32KEY),
+            (
+                "HKEY_LOCAL_MACHINE",
+                registry.HKEY_LOCAL_MACHINE,
+                registry.KEY_WOW64_64KEY,
+            ),
+            (
+                "HKEY_LOCAL_MACHINE",
+                registry.HKEY_LOCAL_MACHINE,
+                registry.KEY_WOW64_32KEY,
+            ),
+            (
+                "HKEY_CURRENT_USER",
+                registry.HKEY_CURRENT_USER,
+                registry.KEY_WOW64_64KEY,
+            ),
+            (
+                "HKEY_CURRENT_USER",
+                registry.HKEY_CURRENT_USER,
+                registry.KEY_WOW64_32KEY,
+            ),
         ]
 
         for hive_name, hive, view in targets:
@@ -39,7 +55,9 @@ class RegistryScanner:
                     registry.KEY_READ | view,
                 )
             except OSError as exc:
-                errors.append(f"{hive_name} uninstall entries could not be opened: {exc}")
+                errors.append(
+                    f"{hive_name} uninstall entries could not be opened: {exc}"
+                )
                 continue
 
             with root_key:
@@ -55,7 +73,9 @@ class RegistryScanner:
                         with registry.OpenKey(root_key, subkey_name) as subkey:
                             application = self._read_application(registry, subkey)
                     except OSError as exc:
-                        errors.append(f"Registry entry '{subkey_name}' could not be read: {exc}")
+                        errors.append(
+                            f"Registry entry '{subkey_name}' could not be read: {exc}"
+                        )
                         continue
 
                     if application is not None:
@@ -91,8 +111,16 @@ class RegistryScanner:
 
         return Application(
             name=display_name,
-            version=version if isinstance(version, str) and version.strip() else None,
-            publisher=publisher if isinstance(publisher, str) and publisher.strip() else None,
+            version=(
+                version
+                if isinstance(version, str) and version.strip()
+                else None
+            ),
+            publisher=(
+                publisher
+                if isinstance(publisher, str) and publisher.strip()
+                else None
+            ),
             install_location=(
                 install_location
                 if isinstance(install_location, str) and install_location.strip()

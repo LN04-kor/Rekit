@@ -57,6 +57,8 @@ The domain model, catalog, JSON storage, and CLI use the Python standard library
 
 Registry and WinGet are independent sources. A Registry display name must not be treated as proof of a WinGet package identifier.
 
+The Registry scanner reads uninstall metadata from the machine-wide and current-user hives, including both 32-bit and 64-bit registry views. Duplicate discoveries are retained at the scanner boundary and are handled by the catalog matching stage.
+
 ## Data model principles
 
 - Rekit record IDs are distinct from external package identifiers.

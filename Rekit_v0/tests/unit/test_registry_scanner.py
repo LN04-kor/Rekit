@@ -74,8 +74,12 @@ def test_registry_scanner_reads_application_metadata(monkeypatch: Any) -> None:
 
     assert result.source is ApplicationSource.REGISTRY
     assert len(result.applications) == 4
-    assert all(application.name == "Example App" for application in result.applications)
-    assert all(application.version == "2.4.1" for application in result.applications)
+    assert all(
+        application.name == "Example App" for application in result.applications
+    )
+    assert all(
+        application.version == "2.4.1" for application in result.applications
+    )
     assert all(
         application.publisher == "Example Publisher"
         for application in result.applications
