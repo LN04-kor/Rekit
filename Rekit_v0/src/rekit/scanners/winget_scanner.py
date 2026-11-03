@@ -118,11 +118,14 @@ class WinGetScanner:
                     )
                     continue
 
-                package_id = package_data.get("Id")
+                package_id = package_data.get("PackageIdentifier")
+                if not isinstance(package_id, str) or not package_id.strip():
+                    package_id = package_data.get("Id")
+
                 if not isinstance(package_id, str) or not package_id.strip():
                     errors.append(
                         f"WinGet package entry {source_index}:{package_index} "
-                        "has no valid Id."
+                        "has no valid package identifier."
                     )
                     continue
 
