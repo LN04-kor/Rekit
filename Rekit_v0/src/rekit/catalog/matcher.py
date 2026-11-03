@@ -1,4 +1,5 @@
 from collections.abc import Sequence
+from typing import Literal
 
 from rekit.models.application import Application, ApplicationSource
 
@@ -94,7 +95,9 @@ class ApplicationMatcher:
 
     @staticmethod
     def _normalize(value: str) -> str:
-        return "".join(character for character in value.casefold() if character.isalnum())
+        return "".join(
+            character for character in value.casefold() if character.isalnum()
+        )
 
     @staticmethod
     def _normalize_path(value: str) -> str:
@@ -128,23 +131,41 @@ class ApplicationMatcher:
             source=preferred.source,
         )
 
-    @staticmethod
-    def _first_value(group: list[Application], field: str) -> str | None:
+    @classmethod
+    def _first_value(
+        cls,
+        group: list[Application],
+        field: Literal["version", "publisher", "install_location", "package_id"],
+    ) -> str | None:
         for application in group:
-            value = getattr(application, field)
+            value = cls._get_value(application, field)
             if value:
                 return value
         return None
 
-    @staticmethod
+    @classmethod
     def _first_value_by_source(
+        cls,
         group: list[Application],
-        field: str,
+        field: Literal["version", "publisher", "install_location", "package_id"],
         source: ApplicationSource,
     ) -> str | None:
         for application in group:
             if application.source is source:
-                value = getattr(application, field)
+                value = cls._get_value(application, field)
                 if value:
                     return value
-        return ApplicationMatcher._first_value(group, field)
+        return cls._first_value(group, field)
+
+    @staticmethod
+    def _get_value(
+        application: Application,
+        field: Literal["version", "publisher", "install_location", "package_id"],
+    ) -> str | None:
+        if field == "version":
+            return application.version
+        if field == "publisher":
+            return application.publisher
+        if field == "install_location":
+            return application.install_location
+        return application.package_id
