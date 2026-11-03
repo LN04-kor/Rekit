@@ -22,16 +22,20 @@ class ApplicationCatalog:
     def sync_discovered_applications(
         self,
         applications: Sequence[Application],
+        preserve_sources: set[ApplicationSource] | None = None,
     ) -> list[Application]:
         discovered = list(applications)
         if any(item.source is ApplicationSource.MANUAL for item in discovered):
             raise ValueError("Discovered applications cannot use the manual source.")
 
-        manual_applications = [
+        preserved_sources = preserve_sources or set()
+        existing_applications = self._storage.load()
+        retained_applications = [
             item
-            for item in self._storage.load()
+            for item in existing_applications
             if item.source is ApplicationSource.MANUAL
+            or item.source in preserved_sources
         ]
-        updated_applications = [*manual_applications, *discovered]
+        updated_applications = [*retained_applications, *discovered]
         self._storage.save(updated_applications)
         return updated_applications
