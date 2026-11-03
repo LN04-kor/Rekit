@@ -48,12 +48,13 @@ The domain model, catalog, JSON storage, and CLI use the Python standard library
 
 ## Discovery flow
 
-1. Core invokes each available scanner independently.
+1. DiscoveryService invokes each configured scanner independently.
 2. A scanner returns normalized records and structured scan diagnostics.
 3. A scanner failure is recorded without discarding successful results from other sources.
-4. The catalog matcher compares records using conservative rules.
-5. Ambiguous matches remain separate or require user confirmation.
-6. The catalog is persisted only after validation succeeds.
+4. Results are checked against the scanner's declared source before aggregation.
+5. The catalog matcher compares all collected records using conservative rules.
+6. DiscoveryResult returns the merged applications together with each scanner's original result and diagnostics.
+7. Persistence is handled separately by catalog services after validation succeeds.
 
 Registry and WinGet are independent sources. A Registry display name must not be treated as proof of a WinGet package identifier.
 
