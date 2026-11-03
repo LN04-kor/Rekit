@@ -55,10 +55,12 @@ python -m mypy src
 - Cross-platform application data model
 - Shared scanner protocol and scan result model
 - Read-only Windows Registry application discovery
+- Read-only WinGet package discovery through JSON export
 - Manual application registration
 - Local JSON catalog with atomic replacement
 - CLI for adding and listing catalog entries
-- WinGet discovery adapter is planned
+
+The WinGet scanner uses `winget export --include-versions`. WinGet package identifiers are used as provisional application names because the export schema does not include display names. Applications that cannot be matched to a configured WinGet source may not appear in the export and remain discoverable through the Registry scanner.
 
 Application installation, cloud synchronization, account management, and GUI workflows are out of scope for this version.
 
