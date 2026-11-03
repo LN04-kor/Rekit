@@ -61,6 +61,8 @@ The Registry scanner reads uninstall metadata from the machine-wide and current-
 
 The WinGet scanner runs `winget export --include-versions` with a fixed argument list and writes the export to a temporary directory. It reads package identifiers and optional versions from the documented `Sources[].Packages[]` structure, supporting both the `PackageIdentifier` field and the legacy `Id` field. Since the export schema does not include a display name, the package identifier is used as the provisional application name. Packages that cannot be matched to a configured source may be omitted by WinGet and remain discoverable through the Registry scanner.
 
+The application matcher normalizes names for case- and punctuation-insensitive comparison. It also supports a conservative package-identifier comparison when the identifier's publisher prefix agrees with the Registry publisher. Conflicting versions, publishers, install locations, or package identifiers prevent automatic merging. Manual entries are never automatically merged. Groups use complete-link matching so a record must be compatible with every member of a group. When records are merged, Registry metadata is preferred and a WinGet package identifier is retained.
+
 The scanner does not accept source agreements automatically, does not invoke installation commands, and applies a process timeout. Its subprocess runner is injectable so unit tests do not require Windows or an installed WinGet executable.
 
 ## Data model principles
