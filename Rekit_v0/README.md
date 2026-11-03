@@ -9,7 +9,7 @@ The initial release maintains a local catalog of application metadata. It does n
 - Python 3.12 or later
 - Git
 
-Windows-specific discovery adapters will require Windows. The core catalog, JSON storage, and CLI are platform-independent.
+Windows-specific discovery adapters require Windows. The core catalog, JSON storage, and CLI are platform-independent.
 
 ## Development setup
 
@@ -36,9 +36,12 @@ python -m pip install -e ".[dev]"
 ## Usage
 
 ```bash
-rekit add "Example App" --version 1.0 --publisher Example
+rekit scan
 rekit list
+rekit add "Example App" --version 1.0 --publisher Example
 ```
+
+Run `rekit scan` on Windows to discover applications through the Windows Registry and WinGet. The command replaces previously discovered entries with the latest scan results while preserving manually registered applications. Partial results are saved and scanner warnings are displayed.
 
 The catalog is stored at `~/.rekit/applications.json`.
 
@@ -58,9 +61,8 @@ python -m mypy src
 - Read-only WinGet package discovery through JSON export
 - Conservative application matching and metadata merging across discovery sources
 - Scanner orchestration with isolated failures and combined discovery results
-- Manual application registration
+- CLI commands for scanning, listing, and manually registering applications
 - Local JSON catalog with atomic replacement
-- CLI for adding and listing catalog entries
 
 The WinGet scanner uses `winget export --include-versions`. WinGet package identifiers are used as provisional application names because the export schema does not include display names. Applications that cannot be matched to a configured WinGet source may not appear in the export and remain discoverable through the Registry scanner.
 
