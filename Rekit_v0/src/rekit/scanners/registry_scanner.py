@@ -4,7 +4,6 @@ from typing import Any
 from rekit.models.application import Application, ApplicationSource
 from rekit.models.scan_result import ScanResult
 
-
 _UNINSTALL_PATH = r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"
 
 
