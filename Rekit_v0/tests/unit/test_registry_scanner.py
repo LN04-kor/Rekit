@@ -88,6 +88,14 @@ def test_registry_scanner_reads_application_metadata(monkeypatch: Any) -> None:
         application.install_location == r"C:\Program Files\Example"
         for application in result.applications
     )
+    assert len({application.source_id for application in result.applications}) == 4
+    assert all(application.source_id is not None for application in result.applications)
+
+    repeated_result = RegistryScanner().scan()
+
+    assert [item.id for item in result.applications] == [
+        item.id for item in repeated_result.applications
+    ]
 
 
 def test_registry_scanner_skips_entries_without_display_name(
