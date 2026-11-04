@@ -130,3 +130,33 @@ def test_scan_command_preserves_previous_records_for_failed_scanner(
 
     assert exit_code == 1
     assert catalog.list_applications() == [previous_application]
+
+def test_partial_scan_does_not_duplicate_existing_application(
+    tmp_path: Path,
+) -> None:
+    catalog = make_catalog(tmp_path)
+    existing_application = Application(
+        name="Example App",
+        version="1.0",
+        publisher="Example Publisher",
+        source=ApplicationSource.REGISTRY,
+    )
+    catalog.add_application(existing_application)
+    rediscovered_application = Application(
+        name="Example App",
+        version="1.0",
+        publisher="Example Publisher",
+        source=ApplicationSource.REGISTRY,
+    )
+    service = DiscoveryService(
+        [FakeScanner([rediscovered_application], ["One registry key failed."])]
+    )
+
+    exit_code = run_command(catalog, ["scan"], service)
+
+    saved_applications = catalog.list_applications()
+
+    assert exit_code == 1
+    assert len(saved_applications) == 1
+    assert saved_applications[0].name == "Example App"
+
