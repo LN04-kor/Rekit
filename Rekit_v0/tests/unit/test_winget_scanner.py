@@ -51,6 +51,7 @@ def test_winget_scanner_reads_package_metadata() -> None:
     assert len(result.applications) == 2
     assert result.applications[0].name == "Example.App"
     assert result.applications[0].package_id == "Example.App"
+    assert result.applications[0].source_id == "Example.App"
     assert result.applications[0].version == "2.4.1"
     assert result.applications[0].source is ApplicationSource.WINGET
     assert result.applications[1].version is None
@@ -72,6 +73,7 @@ def test_winget_scanner_reads_current_package_identifier_field() -> None:
 
     assert len(result.applications) == 1
     assert result.applications[0].package_id == "Example.Current"
+    assert result.applications[0].source_id == "Example.Current"
     assert result.applications[0].version == "3.2.1"
     assert result.errors == []
 
