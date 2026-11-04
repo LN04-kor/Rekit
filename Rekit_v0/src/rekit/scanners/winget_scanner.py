@@ -145,6 +145,7 @@ class WinGetScanner:
                             package_id=package_id,
                             version=version,
                             source=cls.source,
+                            source_id=package_id,
                         )
                     )
                 except ValidationError as exc:
