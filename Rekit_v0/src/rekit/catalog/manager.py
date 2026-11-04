@@ -1,5 +1,6 @@
 from collections.abc import Sequence
 
+from rekit.catalog.matcher import ApplicationMatcher
 from rekit.models.application import Application, ApplicationSource
 from rekit.storage.json_storage import JsonApplicationStorage
 
@@ -36,6 +37,8 @@ class ApplicationCatalog:
             if item.source is ApplicationSource.MANUAL
             or item.source in preserved_sources
         ]
-        updated_applications = [*retained_applications, *discovered]
+        updated_applications = ApplicationMatcher().merge(
+            [*retained_applications, *discovered]
+        )
         self._storage.save(updated_applications)
         return updated_applications
