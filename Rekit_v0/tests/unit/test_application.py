@@ -1,7 +1,7 @@
+from uuid import UUID
+
 import pytest
 from pydantic import ValidationError
-
-from uuid import UUID
 
 from rekit.models.application import Application, ApplicationSource
 
