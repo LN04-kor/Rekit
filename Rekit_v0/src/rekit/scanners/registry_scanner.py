@@ -137,7 +137,7 @@ class RegistryScanner:
                 if isinstance(install_location, str) and install_location.strip()
                 else None
             ),
-            source=self.source,
+            source=ApplicationSource.REGISTRY,
             source_id=source_id,
         )
 
