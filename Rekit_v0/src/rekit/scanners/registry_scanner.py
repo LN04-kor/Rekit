@@ -26,26 +26,30 @@ class RegistryScanner:
             (
                 "HKEY_LOCAL_MACHINE",
                 registry.HKEY_LOCAL_MACHINE,
+                "64",
                 registry.KEY_WOW64_64KEY,
             ),
             (
                 "HKEY_LOCAL_MACHINE",
                 registry.HKEY_LOCAL_MACHINE,
+                "32",
                 registry.KEY_WOW64_32KEY,
             ),
             (
                 "HKEY_CURRENT_USER",
                 registry.HKEY_CURRENT_USER,
+                "64",
                 registry.KEY_WOW64_64KEY,
             ),
             (
                 "HKEY_CURRENT_USER",
                 registry.HKEY_CURRENT_USER,
+                "32",
                 registry.KEY_WOW64_32KEY,
             ),
         ]
 
-        for hive_name, hive, view in targets:
+        for hive_name, hive, view_name, view in targets:
             try:
                 root_key = registry.OpenKey(
                     hive,
@@ -70,7 +74,11 @@ class RegistryScanner:
                     index += 1
                     try:
                         with registry.OpenKey(root_key, subkey_name) as subkey:
-                            application = self._read_application(registry, subkey)
+                            application = self._read_application(
+                                registry,
+                                subkey,
+                                f"{hive_name}:{view_name}:{subkey_name}",
+                            )
                     except OSError as exc:
                         errors.append(
                             f"Registry entry '{subkey_name}' could not be read: {exc}"
@@ -87,7 +95,11 @@ class RegistryScanner:
         )
 
     @staticmethod
-    def _read_application(registry: Any, key: Any) -> Application | None:
+    def _read_application(
+        registry: Any,
+        key: Any,
+        source_id: str,
+    ) -> Application | None:
         display_name = RegistryScanner._read_value(registry, key, "DisplayName")
         if not isinstance(display_name, str) or not display_name.strip():
             return None
@@ -125,7 +137,8 @@ class RegistryScanner:
                 if isinstance(install_location, str) and install_location.strip()
                 else None
             ),
-            source=ApplicationSource.REGISTRY,
+            source=self.source,
+            source_id=source_id,
         )
 
     @staticmethod
